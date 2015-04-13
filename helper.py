@@ -12,22 +12,24 @@ def is_ainstr(command):
 def ainstr(command, labels, addresses):
 	command = command.lstrip("@")
 	
+	print command
+		
 	# variable to track whether string is an integer literal
 	if command.isdigit():
-		return tobinary16(command)
-	
-	# if the command is a label that's already been assigned an address
-	# in RAM, parse the command stored at that address and return it
-	elif command in addresses:
-		return tobinary16(addresses[command])
+		return "%s\n" % tobinary16(command)
 	
 	# if it's a user-defined label, associate that label with the next
 	# available address in RAM, starting at 16, which is the initial
-	# length of the dictionary 'addresses', then parse that value and
-	# return it
-	elif command in labels.keys():
-		addresses[labels[command]] = str(len(addresses))
-		return tobinary16(addresses[command])
+	# length of the dictionary 'addresses'
+	elif command not in addresses.keys():
+		if command in labels.keys():
+			addresses[labels[command]] = str(len(addresses))
+			return "%\n" % tobinary16(addresses[labels[command]])
+		else:
+			addresses[command] = str(len(addresses))
+			return "%s\n" % tobinary16(addresses[command])
+	
+	return "%s\n" % tobinary16(addresses[command])
 	
 # converts string of decimal characters to 16-bit wide binary string
 def tobinary16(string):

@@ -36,7 +36,7 @@ for line in assembly:
 		label = line.lstrip("(").rstrip(")")
 		
 		# a label refers to the address in ROM of the following instruction
-		labels[label] = str(romline)
+		labels[label] = tobinary16(str(romline))
 
 assembly.close()
 
@@ -59,20 +59,23 @@ addresses = {
 }
 
 for line in assembly:
+	# drop the outside whitespace from the line
+	command = line.strip()
+	
 	# ignore comments
-	if line.lstrip()[0:2] == "//":
+	if command[0:2] == "//":
 		continue
 	
 	# ignore empty/whitespace-only lines
-	if line.strip() == "":
+	if command == "":
 		continue
 	
 	# ignore labels -- we've already stored them
-	if line[0] == "(":
+	if command[0] == "(":
 		continue
 	
-	# remove obnoxious inline comments
-	if "//" in line.lstrip():
+	# remove obnoxious inline comments; no overlap with whole-line comments
+	if "//" in command:
 		thing = line.split("//")
 		
 		# un-nest the actual code part, throw away the comment
@@ -80,9 +83,12 @@ for line in assembly:
 		
 		# lose the whitespace, bub
 		command = thing.strip()
-	
+
+	# write the A instruction as a binary string to the .hack file	
 	if is_ainstr(command):
 		machine.write(ainstr(command, labels, addresses))
+
+	# write the C instruction as a binary string to the .hack file
 	else:
 		machine.write(cinstr(command))
 
