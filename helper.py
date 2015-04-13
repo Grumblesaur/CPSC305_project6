@@ -4,20 +4,42 @@ def is_ainstr(command):
 
 
 # function to parse an A-instruction and return a 16-bit binary string
-def ainstr(command):
-	command = int(command.lstrip("@"))
+# command = @-string passed from the main script
+# labels = dictionary of user labels and corresponding ROM addresses
+# addresses = dictionary of user and builtin labels and RAM storage locs.
+def ainstr(command, labels, addresses):
+	command = command.lstrip("@")
 	
-	# converts to binary string w/only significant bits and "0b" header
-	word = bin(command)
+	# variable to track whether string is an integer literal
+	if command.isdigit():
+		return tobinary16(command)
 	
-	# removes "0b" header
-	word = word.lstrip("0b")
+	# if the command is a label that's already been assigned an address
+	# in RAM, parse the command stored at that address and return it
+	elif command in addresses:
+		return tobinary16(addresses[command])
 	
-	# concatenate leading zeroes until the word is 16 bits wide
-	while len(word) < 16:
-		word = "0" + word
+	# if it's a user-defined label, associate that label with the next
+	# available address in RAM, starting at 16, which is the initial
+	# length of the dictionary 'addresses', then parse that value and
+	# return it
+	elif command in labels.keys():
+		addresses[labels[command]] = str(len(addresses))
+		return tobinary16(addresses[command])
 	
-	return "%s\n" % word
+# converts string of decimal characters to 16-bit wide binary string
+def tobinary16(string):
+	# convert to binary string headed by "0b"
+	bits = bin(int(string))
+
+	# remove leading "0b"
+	bits = bits.lstrip("0b")
+	
+	# make the number 16 bits wide
+	while len(bits) < 16:
+		bits = "0" + bits
+	
+	return bits
 
 
 # function to parse a C-instruction and return a 16-bit binary string
