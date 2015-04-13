@@ -1,3 +1,5 @@
+import sys
+
 # function to determine whether command is an A-instruction
 def is_ainstr(command):
 	return True if command[0] == "@" else False

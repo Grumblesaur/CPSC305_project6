@@ -31,16 +31,16 @@ for line in assembly:
 	romline += 1
 	
 	# ignore leading whitespace, see if it's a label
-	if line.strip()[0] == "(":
+	if line.strip() != "" and line.strip()[0] == "(":
 		# remove the bananas and store the raw label string
 		label = line.lstrip("(").rstrip(")")
-	
-	# a label refers to the address in ROM of the following instruction
-	labels[label] = str(romline)
+		
+		# a label refers to the address in ROM of the following instruction
+		labels[label] = str(romline)
 
 assembly.close()
 
-assembly.open()
+assembly = open(filename, 'r')
 machine = open(outfile, 'w')
 
 # pre-defined addresses to be used/appended to by A-instruction
@@ -62,17 +62,29 @@ for line in assembly:
 	# ignore comments
 	if line.lstrip()[0:2] == "//":
 		continue
+	
 	# ignore empty/whitespace-only lines
 	if line.strip() == "":
 		continue
+	
 	# ignore labels -- we've already stored them
 	if line[0] == "(":
 		continue
 	
-	if is_ainstr(line.strip()):
-		machine.write(ainstr(line.strip(), labels, addresses))
+	# remove obnoxious inline comments
+	if "//" in line.lstrip():
+		thing = line.split("//")
+		
+		# un-nest the actual code part, throw away the comment
+		thing = thing[0]
+		
+		# lose the whitespace, bub
+		command = thing.strip()
+	
+	if is_ainstr(command):
+		machine.write(ainstr(command, labels, addresses))
 	else:
-		machine.write(cinstr(line.strip()))
+		machine.write(cinstr(command))
 
 assembly.close()
 machine.close()
