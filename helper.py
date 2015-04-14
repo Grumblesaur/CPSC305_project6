@@ -23,7 +23,12 @@ def ainstr(command, labels, addresses):
 
 		# variable logic
 		else:
-			addresses[command] = str(len(addresses) - 5)
+			addresses[command] = str(len(addresses) - 7)
+			# there are 7 pre-defined labels that either overlap
+			# or are not between 0-15 in the dictionary, so that's
+			# why we're using a 7 here. Poor maintainability, I know,
+			# but this is a one-off assignment.
+
 			return "%s\n" % tobinary16(addresses[command])
 	
 	return "%s\n" % tobinary16(addresses[command])
