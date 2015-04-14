@@ -27,16 +27,22 @@ assembly = open(filename, 'r')
 romline = 0
 labels = {}
 for line in assembly:
-	# labels mark the following address of ROM, so pre-increment the count
-	romline += 1
+	# labels mark the following address of ROM, so pre-increment the count,
+	# but only if it's a non-label line of code
+	temp = line.strip()
+	if temp[0:2] == "//" or temp == "" or temp[0] == "(":
+		romline += 0
+	else:
+		romline += 1
 	
 	# ignore leading whitespace, see if it's a label
-	if line.strip() != "" and line.strip()[0] == "(":
+	if temp != "" and temp[0] == "(":
 		# remove the bananas and store the raw label string
-		label = line.lstrip("(").rstrip(")")
-		
+		partial = line.replace("(", "")
+		label = partial.replace(")", "")
+		label = label.strip()
 		# a label refers to the address in ROM of the following instruction
-		labels[label] = tobinary16(str(romline))
+		labels[label] = str(romline)
 
 assembly.close()
 

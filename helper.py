@@ -11,22 +11,21 @@ def is_ainstr(command):
 # addresses = dictionary of user and builtin labels and RAM storage locs.
 def ainstr(command, labels, addresses):
 	command = command.lstrip("@")
+	print [command]
+	print labels.keys()
 	
-	print command
-		
-	# variable to track whether string is an integer literal
+	# integer literal logic
 	if command.isdigit():
 		return "%s\n" % tobinary16(command)
 	
-	# if it's a user-defined label, associate that label with the next
-	# available address in RAM, starting at 16, which is the initial
-	# length of the dictionary 'addresses'
 	elif command not in addresses.keys():
+		# label / jump target logic
 		if command in labels.keys():
-			addresses[labels[command]] = str(len(addresses))
-			return "%\n" % tobinary16(addresses[labels[command]])
+			return "%s\n" % tobinary16(labels[command])
+
+		# variable logic
 		else:
-			addresses[command] = str(len(addresses))
+			addresses[command] = str(len(addresses) - 5)
 			return "%s\n" % tobinary16(addresses[command])
 	
 	return "%s\n" % tobinary16(addresses[command])
