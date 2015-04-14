@@ -11,8 +11,6 @@ def is_ainstr(command):
 # addresses = dictionary of user and builtin labels and RAM storage locs.
 def ainstr(command, labels, addresses):
 	command = command.lstrip("@")
-	print [command]
-	print labels.keys()
 	
 	# integer literal logic
 	if command.isdigit():
