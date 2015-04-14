@@ -2,7 +2,7 @@ import sys
 
 # function to determine whether command is an A-instruction
 def is_ainstr(command):
-	return True if command[0] == "@" else False
+	return command[0] == "@"
 
 
 # function to parse an A-instruction and return a 16-bit binary string
@@ -94,25 +94,18 @@ def cinstr(command):
 
 # function to parse jump of a command and return 3-bit string
 def get_jump_bits(string):
-	# if no jump mnemonic, return "000"; do not jump
-	if string == "":
-		return "000"
-	# this is dumb code; I'm sorry.
-	elif string == "JGT":
-		return "001"
-	elif string == "JEQ":
-		return "010"
-	elif string == "JGE":
-		return "011"
-	elif string == "JLT":
-		return "100"
-	elif string == "JNE":
-		return "101"
-	elif string == "JLE":
-		return "110"
-	elif string == "JMP":
-		return "111"
-
+	jumpbits = ""
+	jumps = {
+		"" : "000", "JGT" : "001",
+		"JEQ" : "010", "JGE" : "011",
+		"JLT" : "100", "JNE" : "101",
+		"JLE" : "110", "JMP" : "111"
+	}
+	try:
+		jumpbits = jumps[string]
+	except:
+		sys.stdout.write("Invalid jump target! '%s'\n" %string)
+		sys.exit()
 
 # function to parse destination of a command and return 3-bit string
 def get_dest_bits(string):
@@ -120,7 +113,7 @@ def get_dest_bits(string):
 	a = "1" if "A" in string else "0"
 	m = "1" if "M" in string else "0"
 	
-	return a + d + m
+	return "%s%s%s" %(a, d, m)
 
 # function to parse comp of a command and return a 7-bit string
 def get_comp_bits(string):
