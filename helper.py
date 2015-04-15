@@ -105,6 +105,8 @@ def get_jump_bits(string):
 	except:
 		sys.stdout.write("'%s' is an invalid jump target!\n" %string)
 		sys.exit()
+	
+	return jumpbits
 
 # function to parse destination of a command and return 3-bit string
 def get_dest_bits(string):
