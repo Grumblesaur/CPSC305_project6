@@ -1,9 +1,6 @@
 import sys
 from helper import *
 
-if sys.version_info >= (3,0):
-	xrange = range
-	
 # command line argument passed is the input file for the Assembler
 try:
 	filename = str(sys.argv[1])
