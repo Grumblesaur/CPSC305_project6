@@ -81,8 +81,7 @@ def cinstr(command):
 
 	# case w/o assignment or jump considered error
 	else:
-		sys.stdout.write("Assembly instruction was invalid!\n")
-		sys.stdout.write("Blew chunks at command '%s'.\n" %command)
+		sys.stdout.write("'%s' is an invalid instruction!\n" %command)
 		sys.exit()
 	
 	comp = get_comp_bits(mid)
@@ -96,7 +95,7 @@ def cinstr(command):
 def get_jump_bits(string):
 	jumpbits = ""
 	jumps = {
-		"" : "000", "JGT" : "001",
+		"" : "000",    "JGT" : "001",
 		"JEQ" : "010", "JGE" : "011",
 		"JLT" : "100", "JNE" : "101",
 		"JLE" : "110", "JMP" : "111"
@@ -104,7 +103,7 @@ def get_jump_bits(string):
 	try:
 		jumpbits = jumps[string]
 	except:
-		sys.stdout.write("Invalid jump target! '%s'\n" %string)
+		sys.stdout.write("'%s' is an invalid jump target!\n" %string)
 		sys.exit()
 
 # function to parse destination of a command and return 3-bit string
@@ -123,12 +122,12 @@ def get_comp_bits(string):
 	# way to do it
 	
 	mnemonics = {
-		# A-operations first
-		"0" : "0101010", "1" : "0111111",
-		"-1" : "0111010", "D" : "0001100",
-		"A" : "0110000", "!D" : "0001101",
-		"!A" : "0110001", "-D" : "0001111",
-		"-A" : "0110011", "D+1" : "0011111",
+		# A-operations
+		"0" : "0101010",     "1" : "0111111",
+		"-1" : "0111010",    "D" : "0001100",
+		"A" : "0110000",    "!D" : "0001101",
+		"!A" : "0110001",   "-D" : "0001111",
+		"-A" : "0110011",  "D+1" : "0011111",
 		"A+1" : "0110111", "D-1" : "0001110",
 		"A-1" : "0110010", "D+A" : "0000010",
 		"A+D" : "0000010", # forgive A+D since + is commutative
@@ -138,8 +137,8 @@ def get_comp_bits(string):
 		"A&D" : "0000000", "A|D" : "0010101",
 		
 		# M-operations
-		"M" : "1110000", "!M" : "1110001",
-		"-M" : "1110011", "M+1" : "1110111",
+		"M" : "1110000",   "!M" : "1110001",
+		"-M" : "1110011",  "M+1" : "1110111",
 		"M-1" : "1110010", "D+M" : "1000010",
 		"M+D" : "1000010", # forgive M+D since addition is commutative
 		"D-M" : "1010011", "M-D" : "1000111",

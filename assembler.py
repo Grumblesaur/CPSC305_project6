@@ -44,12 +44,18 @@ for line in assembly:
 		# a label refers to the address in ROM of the following instruction
 		labels[label] = str(romline)
 
+# close the input file to prepare for second pass
 assembly.close()
 
+# If the .asm file somehow gets overwritten in the picoseconds of time
+# between the time the file is closed and opened again, the output of this
+# program is not safe.
+
+# open input file for second pass; output file for writing
 assembly = open(filename, 'r')
 machine = open(outfile, 'w')
 
-# pre-defined addresses to be used/appended to by A-instruction
+# pre-defined addresses to be used/appended to by ainstr()
 addresses = {
 	"R0" : "0", "SP" : "0",
 	"R1" : "1", "LCL" : "1",
@@ -83,21 +89,22 @@ for line in assembly:
 	
 	# remove obnoxious inline comments; no overlap with whole-line comments
 	if "//" in command:
-		thing = line.split("//")
+		thing = command.split("//")
 		
 		# un-nest the actual code part, throw away the comment
 		thing = thing[0]
 		
 		# lose the whitespace, bub
 		command = thing.strip()
-
+		
 	# write the A instruction as a binary string to the .hack file	
 	if is_ainstr(command):
 		machine.write(ainstr(command, labels, addresses))
-
+	
 	# write the C instruction as a binary string to the .hack file
 	else:
 		machine.write(cinstr(command))
 
+# close files; exit program
 assembly.close()
 machine.close()
