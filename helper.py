@@ -4,43 +4,32 @@ import sys
 def is_ainstr(command):
 	return command[0] == "@"
 
-
 # function to parse an A-instruction and return a 16-bit binary string
 # command = @-string passed from the main script
 # labels = dictionary of user labels and corresponding ROM addresses
 # addresses = dictionary of user and builtin labels and RAM storage locs.
 def ainstr(command, labels, addresses):
 	command = command.lstrip("@")
-	
-	# integer literal logic
-	if command.isdigit():
+	if command.isdigit(): # input is integer literal
 		return "%s\n" % tobinary16(command)
 	
 	elif command not in addresses.keys():
-		# label / jump target logic
-		if command in labels.keys():
+		if command in labels.keys(): # input is a label / jump target
 			return "%s\n" % tobinary16(labels[command])
-
-		# variable logic
-		else:
+		else: #input is a variable
 			addresses[command] = str(len(addresses) - 7)
 			# there are 7 pre-defined labels that either overlap
-			# or are not between 0-15 in the dictionary, so that's
-			# why we're using a 7 here. Poor maintainability, I know,
-			# but this is a one-off assignment.
-
+			# or are not between 0-15 in the dictionary
 			return "%s\n" % tobinary16(addresses[command])
 	
+	# input is in addresses.keys()
 	return "%s\n" % tobinary16(addresses[command])
 	
 # converts string of decimal characters to 16-bit wide binary string
 def tobinary16(string):
 	# convert to binary string headed by "0b"
-	bits = bin(int(string))
+	bits = bin(int(string))[2:]
 
-	# remove leading "0b"
-	bits = bits.lstrip("0b")
-	
 	# make the number 16 bits wide
 	while len(bits) < 16:
 		bits = "0" + bits
@@ -51,18 +40,12 @@ def tobinary16(string):
 # function to parse a C-instruction and return a 16-bit binary string
 def cinstr(command):
 	# initialize strings to fill with command information
-	lhs = "" # left of equals sign
-	mid = "" # the computation portion in the middle
-	rhs = "" # right of semicolon
+	lhs = rhs = mid = "" 
 	
 	# worst-case when command is of format DEST=COMP;JUMP
 	if "=" in command and ";" in command:
-		# this is a gnarly and probably unpythonic way to break this down
 		temp = command.split("=")
-		# get the expression left of the equals sign
 		lhs = temp[0]
-		
-		# break down the remainder into mid and rhs
 		temp = temp[1].split(";")
 		mid = temp[0]
 		rhs = temp[1]
@@ -81,8 +64,7 @@ def cinstr(command):
 
 	# case w/o assignment or jump considered error
 	else:
-		sys.stdout.write("'%s' is an invalid instruction!\n" %command)
-		sys.exit()
+		raise Exception("'%s' is an invalid instruction!\n" %command)
 	
 	comp = get_comp_bits(mid)
 	dest = get_dest_bits(lhs)
@@ -103,8 +85,7 @@ def get_jump_bits(string):
 	try:
 		jumpbits = jumps[string]
 	except:
-		sys.stdout.write("'%s' is an invalid jump target!\n" %string)
-		sys.exit()
+		raise Exception("'%s' is an invalid jump target!\n" %string)
 	
 	return jumpbits
 
@@ -113,16 +94,11 @@ def get_dest_bits(string):
 	d = "1" if "D" in string else "0"
 	a = "1" if "A" in string else "0"
 	m = "1" if "M" in string else "0"
-	
 	return "%s%s%s" %(a, d, m)
 
 # function to parse comp of a command and return a 7-bit string
 def get_comp_bits(string):
-	# forgive me, but this code is stupid
-	# it works, but it's not smart and would be totally impractical
-	# on literally any other processor; I just can't think of a smarter
-	# way to do it
-	
+	# small instruction sets ftw, who needs smart programming?
 	mnemonics = {
 		# A-operations
 		"0" : "0101010",     "1" : "0111111",
@@ -151,7 +127,6 @@ def get_comp_bits(string):
 	try:
 		comp = mnemonics[string]
 	except:
-		sys.stdout.write("'%s' is an invalid command!\n" %string)
-		sys.exit()
+		raise Exception("'%s' is an invalid command!\n" %string)
 	return comp
 	

@@ -8,7 +8,6 @@ except:
 	sys.stdout.write("No file to assemble!\n")
 	sys.exit()
 
-
 outfile = ""
 
 # guarantee that the assembler receives the correct type of file
@@ -28,7 +27,7 @@ for line in assembly:
 	# but only if it's a non-label line of code
 	temp = line.strip()
 	if temp[0:2] == "//" or temp == "" or temp[0] == "(":
-		romline += 0
+		pass
 	else:
 		romline += 1
 	
@@ -72,32 +71,24 @@ for line in assembly:
 	# drop the outside whitespace from the line
 	command = line.strip()
 	
-	# ignore comments
+	# ignore comments, whitespace, empty lines, and labels
 	if command[0:2] == "//":
 		continue
-	
-	# ignore empty/whitespace-only lines
 	if command == "":
 		continue
-	
-	# ignore labels -- we've already stored them
 	if command[0] == "(":
 		continue
 	
 	# remove obnoxious inline comments; no overlap with whole-line comments
 	if "//" in command:
 		thing = command.split("//")
-		
-		# un-nest the actual code part, throw away the comment
+		# un-nest the actual code part, toss the comment and whitespace
 		thing = thing[0]
-		
-		# lose the whitespace, bub
 		command = thing.strip()
 		
 	# write the A instruction as a binary string to the .hack file	
 	if is_ainstr(command):
 		machine.write(ainstr(command, labels, addresses))
-	
 	# write the C instruction as a binary string to the .hack file
 	else:
 		machine.write(cinstr(command))
