@@ -1,13 +1,19 @@
 import sys
 
+def is_label(s):
+	return s[0:2] == "//" or s == "" or s[0] == "("
+
+def prepare_label(s):
+	temp = s.replace("(","")
+	label = temp.replace(")","")
+	label = label.strip()
+	return label
+
 # function to determine whether command is an A-instruction
 def is_ainstr(command):
 	return command[0] == "@"
 
-# function to parse an A-instruction and return a 16-bit binary string
-# command = @-string passed from the main script
-# labels = dictionary of user labels and corresponding ROM addresses
-# addresses = dictionary of user and builtin labels and RAM storage locs.
+# parse an A instruction
 def ainstr(command, labels, addresses):
 	command = command.lstrip("@")
 	if command.isdigit(): # input is integer literal
@@ -33,9 +39,7 @@ def tobinary16(string):
 	# make the number 16 bits wide
 	while len(bits) < 16:
 		bits = "0" + bits
-	
 	return bits
-
 
 # function to parse a C-instruction and return a 16-bit binary string
 def cinstr(command):
@@ -72,7 +76,6 @@ def cinstr(command):
 	
 	return "111%s%s%s\n" %(comp, dest, jump)
 
-
 # function to parse jump of a command and return 3-bit string
 def get_jump_bits(string):
 	jumpbits = ""
@@ -100,28 +103,23 @@ def get_dest_bits(string):
 def get_comp_bits(string):
 	# small instruction sets ftw, who needs smart programming?
 	mnemonics = {
-		# A-operations
-		"0" : "0101010",     "1" : "0111111",
-		"-1" : "0111010",    "D" : "0001100",
-		"A" : "0110000",    "!D" : "0001101",
-		"!A" : "0110001",   "-D" : "0001111",
+		# commutative operations | & + are allowed in both directions
+		"0" : "0101010",   "1" : "0111111",
+		"-1" : "0111010",  "D" : "0001100",
+		"A" : "0110000",   "!D" : "0001101",
+		"!A" : "0110001",  "-D" : "0001111",
 		"-A" : "0110011",  "D+1" : "0011111",
 		"A+1" : "0110111", "D-1" : "0001110",
 		"A-1" : "0110010", "D+A" : "0000010",
-		"A+D" : "0000010", # forgive A+D since + is commutative
-		"D-A" : "0010011", "A-D" : "0000111",
-		"D&A" : "0000000", "D|A" : "0010101",
-		# forgive inverted A&D and A|D, since & and | are commutative
-		"A&D" : "0000000", "A|D" : "0010101",
-		
-		# M-operations
-		"M" : "1110000",   "!M" : "1110001",
-		"-M" : "1110011",  "M+1" : "1110111",
-		"M-1" : "1110010", "D+M" : "1000010",
-		"M+D" : "1000010", # forgive M+D since addition is commutative
+		"A+D" : "0000010", "D-A" : "0010011",
+		"A-D" : "0000111", "D&A" : "0000000",
+		"D|A" : "0010101", "A&D" : "0000000",
+		"A|D" : "0010101", "M" : "1110000",
+		"!M" : "1110001",  "-M" : "1110011",
+		"M+1" : "1110111", "M-1" : "1110010",
+		"D+M" : "1000010", "M+D" : "1000010", 
 		"D-M" : "1010011", "M-D" : "1000111",
 		"D&M" : "1000000", "D|M" : "1010101",
-		# forgive inverted M&D and M|D since & and | are commutative
 		"M&D" : "1000000", "M|D" : "1010101"
 	}
 	try:

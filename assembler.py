@@ -1,21 +1,15 @@
 import sys
 from helper import *
 
-# command line argument passed is the input file for the Assembler
+# reraise File I/O exceptions with helpful errors
 try:
 	filename = str(sys.argv[1])
 except:
-	sys.stdout.write("No file to assemble!\n")
-	sys.exit()
-
-outfile = ""
-
-# guarantee that the assembler receives the correct type of file
+	raise Exception("No file to assemble!\n")
 try:
 	outfile = filename.replace(".asm", ".hack")
 except:
-	sys.stdout.write("Invalid or missing file extension!\n")
-	sys.exit()
+	raise Exception("Invalid or missing file extension!\n")
 
 assembly = open(filename, 'r')
 
@@ -26,26 +20,13 @@ for line in assembly:
 	# labels mark the following address of ROM, so pre-increment the count,
 	# but only if it's a non-label line of code
 	temp = line.strip()
-	if temp[0:2] == "//" or temp == "" or temp[0] == "(":
-		pass
-	else:
+	if not is_label(temp):
 		romline += 1
-	
-	# ignore leading whitespace, see if it's a label
 	if temp != "" and temp[0] == "(":
-		# remove the bananas and store the raw label string
-		partial = line.replace("(", "")
-		label = partial.replace(")", "")
-		label = label.strip()
-		# a label refers to the address in ROM of the following instruction
-		labels[label] = str(romline)
+		labels[prepare_label(temp)] = str(romline)
 
 # close the input file to prepare for second pass
 assembly.close()
-
-# If the .asm file somehow gets overwritten in the picoseconds of time
-# between the time the file is closed and opened again, the output of this
-# program is not safe.
 
 # open input file for second pass; output file for writing
 assembly = open(filename, 'r')
