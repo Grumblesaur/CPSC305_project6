@@ -1,7 +1,11 @@
 import sys
 
-def is_label(s):
+def is_skippable(s):
 	return s[0:2] == "//" or s == "" or s[0] == "("
+
+def pop_inline_comment(s):
+	temp = s.split("//")
+	return temp[0].strip()
 
 def prepare_label(s):
 	temp = s.replace("(","")

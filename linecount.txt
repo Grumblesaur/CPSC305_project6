@@ -1,0 +1,14 @@
+134 lines in file 'helper.py'.
+94 lines of code.
+19 lines of comments.
+21 lines of whitespace.
+
+65 lines in file 'assembler.py'.
+48 lines of code.
+10 lines of comments.
+7 lines of whitespace.
+
+199 lines in files overall.
+142 lines of code.
+29 lines of comments.
+28 lines of whitespace.
